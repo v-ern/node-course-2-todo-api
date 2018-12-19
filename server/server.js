@@ -22,6 +22,17 @@ app.post('/todos', (req, res) => {
   );
 });
 
+app.get('/todos', (req, res) => {
+  Todo.find().then(
+    todos => {
+      res.send({ todos }); // send back an object with todos instead of sending directly the array back => makes it more flexible and allows to add custom keys to the object later on, like status codes
+    },
+    err => {
+      res.status(400).send(err);
+    }
+  );
+});
+
 app.listen(3000, () => {
   console.log('Server started on Port 3000.');
 });
