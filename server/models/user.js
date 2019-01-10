@@ -42,6 +42,7 @@ UserSchema.methods.toJSON = function() {
 };
 
 UserSchema.methods.generateAuthToken = function() {
+  //INSTANCE method, gets called with the individual document, so in this case "user"
   var user = this;
   var access = 'auth';
   var token = jwt
@@ -54,6 +55,24 @@ UserSchema.methods.generateAuthToken = function() {
     user.save().then(doc => {
       resolve(token);
     });
+  });
+};
+
+UserSchema.statics.findByToken = function(token) {
+  //STATICS methods get called with the model, in this case "User"
+  var User = this;
+  var decoded;
+  try {
+    //try-catch-blocks: if an error happens in the try block, execution is immediately stopped and the catch-block is executed
+    decoded = jwt.verify(token, 'abc123');
+  } catch (e) {
+    return Promise.reject();
+  }
+
+  return User.findOne({
+    _id: decoded._id,
+    'tokens.token': token, //quotes are required if there's a dot in the value
+    'tokens.access': 'auth'
   });
 };
 
